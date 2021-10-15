@@ -1,5 +1,5 @@
 {
-  "name": "vue-json-view",
+  "name": "@matpool/vue-json-view",
   "version": "0.1.0",
   "description": "vue3 component for displaying javascript arrays and JSON objects.",
   "main": "./dist/vue-json-view.umd.js",
@@ -11,7 +11,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "dev": "vite serve example",
@@ -28,14 +29,17 @@
     "json-display",
     "json-view",
     "json-viewer",
-    "json-tree",
     "vue",
     "vue-component",
     "vue-json",
     "theme"
   ],
-  "author": "Sam",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vueComponent/ant-design-vue.git"
+  },
   "license": "MIT",
+  "author": "Sam Chai",
   "dependencies": {
     "react-base16-styling": "^0.8.0"
   },

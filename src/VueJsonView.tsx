@@ -30,7 +30,7 @@ export default defineComponent({
   setup(props) {
     // initialize
     const setting = reactive({
-      theme: 'rjv-default',
+      theme: 'monokai',
       collapseStringsAfterLength: 5,
       shouldCollapse: false,
       quotesOnKeys: true,
