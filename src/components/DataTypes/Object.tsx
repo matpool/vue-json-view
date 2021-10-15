@@ -1,4 +1,4 @@
-import { defineComponent, reactive, computed, toRaw } from 'vue'
+import { defineComponent, inject, reactive, computed, toRaw } from 'vue'
 import { toType } from '../../helpers/util'
 
 import VariableEditor from './../VariableEditor'
@@ -6,11 +6,9 @@ import VariableMeta from './../VariableMeta'
 import ArrayGroup from './../ArrayGroup'
 import ObjectName from './../ObjectName'
 
-//attribute store
-import { store } from '../../stores'
-
 //icons
-import { CollapsedIcon, ExpandedIcon } from './../ToggleIcons'
+import CollapsedIcon from '../ToggleIcons/CollapsedIcon'
+import ExpandedIcon from '../ToggleIcons/ExpandedIcon'
 
 //theme
 import Theme from './../../themes/getStyle'
@@ -36,10 +34,6 @@ const JsonObject = defineComponent({
   name: 'Object',
   props: {
     jsvRoot: Boolean,
-    vjvId: {
-      type: String,
-      required: true,
-    },
     src: {
       type: Object,
       required: true,
@@ -70,7 +64,7 @@ const JsonObject = defineComponent({
     },
   },
   setup(props: any) {
-    const setting = store.get('setting')
+    const setting: any = inject('setting')
 
     const state = reactive<{
       expanded: undefined | Boolean

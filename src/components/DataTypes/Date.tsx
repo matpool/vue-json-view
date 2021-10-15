@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue'
+import { defineComponent, inject } from 'vue'
 import DataTypeLabel from './DataTypeLabel'
 
 //theme
@@ -6,17 +6,14 @@ import Theme from '../../themes/getStyle'
 
 export default defineComponent({
   props: {
-    theme: {
-      type: String,
-      required: true,
-    },
     value: {
       type: Date,
       required: true,
     },
-    displayDataTypes: Boolean,
   },
-  render() {
+  setup(props) {
+    const setting: any = inject('setting')
+
     const display_options = {
       weekday: 'short',
       year: 'numeric',
@@ -26,11 +23,11 @@ export default defineComponent({
       minute: '2-digit',
     }
 
-    return (
-      <div {...Theme(this.$props.theme, 'date')}>
-        {this.$props.displayDataTypes && <DataTypeLabel theme={this.$props.theme} typeName="date" />}
-        <span class="date-value" {...Theme(this.$props.theme, 'date-value')}>
-          {this.$props.value.toLocaleTimeString('en-us', display_options as Intl.DateTimeFormatOptions)}
+    return () => (
+      <div {...Theme(setting.theme, 'date')}>
+        {setting.displayDataTypes && <DataTypeLabel typeName="date" />}
+        <span class="date-value" {...Theme(setting.theme, 'date-value')}>
+          {props.value.toLocaleTimeString('en-us', display_options as Intl.DateTimeFormatOptions)}
         </span>
       </div>
     )

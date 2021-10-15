@@ -1,9 +1,6 @@
-import { defineComponent, reactive } from 'vue'
+import { defineComponent, inject, reactive } from 'vue'
 
 import CopyToClipboard from './CopyToClipboard'
-
-//attribute store for storing collapsed state
-import { store } from '../stores'
 
 //data type components
 import {
@@ -38,7 +35,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const setting = store.get('setting')
+    const setting: any = inject('setting')
+
     const state = reactive({
       editMode: false,
       editValue: '',

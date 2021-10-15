@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue'
+import { defineComponent, inject } from 'vue'
 import DataTypeLabel from './DataTypeLabel'
 
 //theme
@@ -6,17 +6,14 @@ import Theme from './../../themes/getStyle'
 
 export default defineComponent({
   props: {
-    theme: {
-      type: String,
-      required: true,
-    },
     value: Boolean,
-    displayDataTypes: Boolean,
   },
   setup(props) {
+    const setting: any = inject('setting')
+
     return () => (
-      <div {...Theme(props.theme, 'boolean')}>
-        {props.displayDataTypes && <DataTypeLabel theme={props.theme} typeName="bool" />}
+      <div {...Theme(setting.theme, 'boolean')}>
+        {setting.displayDataTypes && <DataTypeLabel typeName="bool" />}
         {props.value ? 'true' : 'false'}
       </div>
     )

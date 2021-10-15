@@ -1,15 +1,13 @@
-import { defineComponent, reactive, toRaw } from 'vue'
+import { defineComponent, inject, reactive, toRaw } from 'vue'
 import Theme from './../themes/getStyle'
 
 import VariableMeta from './VariableMeta'
 import ObjectName from './ObjectName'
 import ObjectComponent from './DataTypes/Object'
 
-//attribute store
-import { store } from '../stores'
-
 //icons
-import { CollapsedIcon, ExpandedIcon } from './ToggleIcons'
+import CollapsedIcon from './ToggleIcons/CollapsedIcon'
+import ExpandedIcon from './ToggleIcons/ExpandedIcon'
 
 //single indent is 5px
 const SINGLE_INDENT = 5
@@ -17,10 +15,6 @@ const SINGLE_INDENT = 5
 export default defineComponent({
   props: {
     jsvRoot: Boolean,
-    vjvId: {
-      type: String,
-      required: true,
-    },
     src: {
       type: Object,
       required: true,
@@ -51,7 +45,8 @@ export default defineComponent({
     },
   },
   setup(props: any) {
-    const setting = store.get('setting')
+    const setting: any = inject('setting')
+
     const state = reactive<{ [key: string]: any[] }>({
       expanded: [],
     })
@@ -133,7 +128,6 @@ export default defineComponent({
                     namespace={namespace}
                     type="array"
                     parentType="array_group"
-                    theme={theme}
                   />
                 ) : (
                   <span

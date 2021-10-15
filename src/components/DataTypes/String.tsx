@@ -1,12 +1,9 @@
-import { defineComponent, reactive } from 'vue'
+import { defineComponent, inject, reactive } from 'vue'
 import DataTypeLabel from './DataTypeLabel'
 import { toType } from '../../helpers/util'
 
 //theme
 import Theme from '../../themes/getStyle'
-
-//attribute store for storing collapsed state
-import { store } from '../../stores'
 
 export default defineComponent({
   props: {
@@ -16,7 +13,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const setting = store.get('setting')
+    const setting: any = inject('setting')
+
     const state = reactive({
       collapsed: true,
     })
@@ -46,7 +44,7 @@ export default defineComponent({
 
       return (
         <div {...Theme(theme, 'string')}>
-          {displayDataTypes && <DataTypeLabel typeName="string" theme={theme} />}
+          {displayDataTypes && <DataTypeLabel typeName="string" />}
           <span class="string-value" {...style} onClick={toggleCollapsed}>
             "{value}"
           </span>

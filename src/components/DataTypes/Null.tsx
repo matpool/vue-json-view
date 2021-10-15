@@ -1,16 +1,12 @@
-import { defineComponent } from 'vue'
+import { defineComponent, inject } from 'vue'
 
 //theme
 import Theme from '../../themes/getStyle'
 
 export default defineComponent({
-  props: {
-    theme: {
-      type: String,
-      required: true,
-    },
-  },
-  render() {
-    return <div {...Theme(this.$props.theme, 'null')}>NULL</div>
+  setup() {
+    const setting: any = inject('setting')
+
+    return () => <div {...Theme(setting.theme, 'null')}>NULL</div>
   },
 })

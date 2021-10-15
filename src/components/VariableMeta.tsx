@@ -1,9 +1,6 @@
-import { defineComponent, toRaw } from 'vue'
+import { defineComponent, inject, toRaw } from 'vue'
 
 import CopyToClipboard from './CopyToClipboard'
-
-//attribute store
-import { store } from '../stores'
 
 //theme
 import Theme from './../themes/getStyle'
@@ -21,7 +18,7 @@ export default defineComponent({
     rowHovered: Boolean,
   },
   setup(props) {
-    const setting = store.get('setting')
+    const setting: any = inject('setting')
 
     function getObjectSize() {
       if (setting.displayObjectSize) {

@@ -3,7 +3,7 @@
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import { ref } from 'vue'
 import dayjs from 'dayjs'
-import VueJsonView from './VueJsonView'
+import VueJsonView from '../src/VueJsonView'
 
 const srcStr = {
   string: 'this is a test string',

@@ -1,11 +1,9 @@
-import { defineComponent, reactive, onBeforeUnmount } from 'vue'
+import { defineComponent, inject, reactive, onBeforeUnmount } from 'vue'
 
 import { toType } from './../helpers/util'
 
-import { store } from '../stores'
-
 //clibboard icon
-import { Clippy } from './icons'
+import { Clippy } from './ToggleIcons/icons'
 
 //theme
 import Theme from './../themes/getStyle'
@@ -20,7 +18,8 @@ export default defineComponent({
     hidden: Boolean,
   },
   setup(props: any) {
-    const setting = store.get('setting')
+    const setting: any = inject('setting')
+
     const state = reactive({ copied: false })
 
     let copiedTimer: any = null

@@ -1,9 +1,8 @@
-import { defineComponent, ref, toRaw } from 'vue'
+import { defineComponent, provide, reactive, ref, toRaw } from 'vue'
 
 import JsonObject from './components/DataTypes/Object'
 import ArrayGroup from './components/ArrayGroup'
 import { toType } from './helpers/util'
-import { store } from './stores'
 
 //global theme
 import Theme from './themes/getStyle'
@@ -30,12 +29,27 @@ export default defineComponent({
   },
   setup(props) {
     // initialize
-    const setting = store.get('setting')
+    const setting = reactive({
+      theme: 'rjv-default',
+      collapseStringsAfterLength: 5,
+      shouldCollapse: false,
+      quotesOnKeys: true,
+      groupArraysAfterLength: 100,
+      indentWidth: 2,
+      enableClipboard: true,
+      displayObjectSize: true,
+      displayDataTypes: false,
+      iconStyle: 'triangle',
+      defaultValue: null,
+      displayArrayKey: true,
+      collapsed: false,
+      sortKeys: true,
+    })
+
+    provide('setting', setting)
 
     const srcRef = ref({})
-    const name = ref(setting.name)
-
-    const vjvId = Date.now().toString()
+    const name = ref('root')
 
     return () => {
       try {
@@ -59,15 +73,14 @@ export default defineComponent({
       const objectProps = {
         ...propsRaw,
         src: srcRef.value,
-        name: setting.name,
-        namespace: [setting.name],
+        name: name.value,
+        namespace: [name.value],
         depth: 0,
         jsvRoot: true,
-        vjvId,
         type: toType(srcRef.value),
       }
 
-      setting.update(propsRaw)
+      Object.assign(setting, propsRaw)
 
       let ObjectComponent = JsonObject
       if (

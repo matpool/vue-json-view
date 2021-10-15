@@ -1,26 +1,19 @@
-import { defineComponent, reactive } from 'vue'
+import { defineComponent, inject, reactive } from 'vue'
 import DataTypeLabel from './DataTypeLabel'
 
 //theme
 import Theme from '../../themes/getStyle'
 
-//attribute store for storing collapsed state
-import { store } from '../../stores'
-
 export default defineComponent({
   props: {
-    theme: {
-      type: String,
-      required: true,
-    },
     value: {
       type: Function,
       required: true,
     },
-    displayDataTypes: Boolean,
   },
   setup(props) {
-    const setting = store.get('setting')
+    const setting: any = inject('setting')
+
     const state = reactive({
       collapsed: true,
     })
@@ -35,7 +28,7 @@ export default defineComponent({
             {props.value.toString().replace(/\{[\s\S]+/, '')}
             <span class="function-collapsed" style={{ fontWeight: 'bold' }}>
               <span>{'{'}</span>
-              <span {...Theme(props.theme, 'ellipsis')}>...</span>
+              <span {...Theme(setting.theme, 'ellipsis')}>...</span>
               <span>{'}'}</span>
             </span>
           </span>
@@ -50,7 +43,7 @@ export default defineComponent({
 
       return (
         <div {...Theme(theme, 'function')}>
-          {displayDataTypes && <DataTypeLabel theme={theme} typeName="function" />}
+          {displayDataTypes && <DataTypeLabel typeName="function" />}
           <span {...Theme(theme, 'function-value')} class="rjv-function-container" onClick={toggleCollapsed}>
             {getFunctionDisplay(state.collapsed)}
           </span>
