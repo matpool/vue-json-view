@@ -3,30 +3,18 @@ import { defineComponent, ref, toRaw } from 'vue'
 import JsonObject from './components/DataTypes/Object'
 import ArrayGroup from './components/ArrayGroup'
 import { toType } from './helpers/util'
-import ObjectAttributes from './stores/ObjectAttributes'
+import { store } from './stores'
 
 //global theme
 import Theme from './themes/getStyle'
 
-const defaultSetting = {
-  name: 'root',
-  theme: 'rjv-default',
-  collapseStringsAfterLength: 50,
-  shouldCollapse: false,
-  quotesOnKeys: true,
-  groupArraysAfterLength: 100,
-  indentWidth: 2,
-  enableClipboard: true,
-  displayObjectSize: true,
-  displayDataTypes: false,
-  iconStyle: 'triangle',
-  defaultValue: null,
-  displayArrayKey: true,
-}
-
 export default defineComponent({
+  name: 'VueJsonView',
   props: {
-    theme: String,
+    theme: {
+      type: String,
+      default: '',
+    },
     src: {
       type: [String, Object],
       required: true,
@@ -41,8 +29,11 @@ export default defineComponent({
     },
   },
   setup(props) {
+    // initialize
+    const setting = store.get('setting')
+
     const srcRef = ref({})
-    const name = ref(defaultSetting.name)
+    const name = ref(setting.name)
 
     const vjvId = Date.now().toString()
 
@@ -62,19 +53,21 @@ export default defineComponent({
 
       const propsRaw: any = { ...toRaw(props) }
       delete propsRaw.src
+      if (!propsRaw.theme) {
+        delete propsRaw.theme
+      }
       const objectProps = {
-        ...defaultSetting,
         ...propsRaw,
         src: srcRef.value,
-        namespace: [defaultSetting.name],
+        name: setting.name,
+        namespace: [setting.name],
         depth: 0,
         jsvRoot: true,
         vjvId,
         type: toType(srcRef.value),
       }
-      // initialize
-      ObjectAttributes.set(vjvId, 'global', 'src', toRaw(srcRef.value))
-      ObjectAttributes.set(vjvId, 'global', 'setting', objectProps)
+
+      setting.update(propsRaw)
 
       let ObjectComponent = JsonObject
       if (

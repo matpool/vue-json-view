@@ -5,6 +5,9 @@ import VariableMeta from './VariableMeta'
 import ObjectName from './ObjectName'
 import ObjectComponent from './DataTypes/Object'
 
+//attribute store
+import { store } from '../stores'
+
 //icons
 import { CollapsedIcon, ExpandedIcon } from './ToggleIcons'
 
@@ -14,22 +17,41 @@ const SINGLE_INDENT = 5
 export default defineComponent({
   props: {
     jsvRoot: Boolean,
-    vjvId: String,
-    src: Object,
-    theme: String,
-    displayObjectSize: Boolean,
-    enableClipboard: Boolean,
-    name: String,
-    namespace: Array,
-    indentWidth: Number,
-    displayDataTypes: Boolean,
-    groupArraysAfterLength: Number,
-    quotesOnKeys: Boolean,
-    type: String,
-    depth: Number,
-    collapsed: [Boolean, Number],
+    vjvId: {
+      type: String,
+      required: true,
+    },
+    src: {
+      type: Object,
+      required: true,
+    },
+    name: {
+      type: [String, Boolean],
+      default: '',
+    },
+    namespace: {
+      type: Array,
+      required: true,
+    },
+    indexOffset: {
+      type: Number,
+      default: 0,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    depth: {
+      type: Number,
+      required: true,
+    },
+    parentType: {
+      type: String,
+      default: '',
+    },
   },
   setup(props: any) {
+    const setting = store.get('setting')
     const state = reactive<{ [key: string]: any[] }>({
       expanded: [],
     })
@@ -44,7 +66,7 @@ export default defineComponent({
     }
 
     function getExpandedIcon(i: number) {
-      const { theme, iconStyle } = props
+      const { theme, iconStyle } = setting
 
       if (state.expanded[i]) {
         return <ExpandedIcon {...{ theme, iconStyle }} />
@@ -54,29 +76,19 @@ export default defineComponent({
     }
 
     return () => {
-      const {
-        src,
-        groupArraysAfterLength,
-        depth,
-        name,
-        theme,
-        jsvRoot,
-        namespace,
-        parent_type,
-        ...rest
-      } = toRaw(props)
+      const { groupArraysAfterLength, theme } = setting
+      const { src, depth, name, jsvRoot, namespace, parentType, ...rest } = toRaw(props)
 
       let object_padding_left = 0
 
-      const array_group_padding_left = props.indentWidth * SINGLE_INDENT
+      const array_group_padding_left = setting.indentWidth * SINGLE_INDENT
 
       if (!jsvRoot) {
-        object_padding_left = props.indentWidth * SINGLE_INDENT
+        object_padding_left = setting.indentWidth * SINGLE_INDENT
       }
 
       const size = groupArraysAfterLength
       const groups = Math.ceil(src.length / size)
-
 
       return (
         <div
@@ -85,7 +97,7 @@ export default defineComponent({
             paddingLeft: object_padding_left,
           })}
         >
-          <ObjectName {...props} />
+          <ObjectName theme={theme} quotesOnKeys={setting.quotesOnKeys} {...props} />
 
           <span>
             <VariableMeta size={src.length} {...props} />
@@ -111,18 +123,17 @@ export default defineComponent({
                 </div>
                 {state.expanded[i] ? (
                   <ObjectComponent
+                    {...rest}
                     key={name + i}
                     depth={0}
                     name={false}
                     collapsed={false}
-                    groupArraysAfterLength={size}
-                    index_offset={i * size}
+                    indexOffset={i * size}
                     src={src.slice(i * size, i * size + size)}
                     namespace={namespace}
                     type="array"
-                    parent_type="array_group"
+                    parentType="array_group"
                     theme={theme}
-                    {...rest}
                   />
                 ) : (
                   <span
@@ -137,7 +148,7 @@ export default defineComponent({
                       <span class="object-size" {...Theme(theme, 'object-size')}>
                         {i * size}
                         {' - '}
-                        {i * size + size > src.length ? src.length : i * size + size}
+                        {i * size + size > src.length ? src.length - 1 : i * size + size - 1}
                       </span>
                     </div>
                     ]

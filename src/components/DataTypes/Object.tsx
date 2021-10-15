@@ -1,4 +1,4 @@
-import { defineComponent, reactive, toRaw } from 'vue'
+import { defineComponent, reactive, computed, toRaw } from 'vue'
 import { toType } from '../../helpers/util'
 
 import VariableEditor from './../VariableEditor'
@@ -7,7 +7,7 @@ import ArrayGroup from './../ArrayGroup'
 import ObjectName from './../ObjectName'
 
 //attribute store
-import AttributeStore from './../../stores/ObjectAttributes'
+import { store } from '../../stores'
 
 //icons
 import { CollapsedIcon, ExpandedIcon } from './../ToggleIcons'
@@ -19,29 +19,6 @@ import Theme from './../../themes/getStyle'
 const DEPTH_INCREMENT = 1
 //single indent is 5px
 const SINGLE_INDENT = 5
-
-const getState = (props: any) => {
-  const size = Object.keys(props.src).length
-  const expanded =
-    (props.collapsed === false || (props.collapsed !== true && props.collapsed > props.depth)) &&
-    (!props.shouldCollapse ||
-      props.shouldCollapse({
-        name: props.name,
-        src: props.src,
-        type: toType(props.src),
-        namespace: props.namespace,
-      }) === false) &&
-    //initialize closed if object has no items
-    size !== 0
-  const state = {
-    expanded: AttributeStore.get(props.vjvId, props.namespace, 'expanded', expanded),
-    object_type: props.type === 'array' ? 'array' : 'object',
-    parent_type: props.type === 'array' ? 'array' : 'object',
-    size,
-    hovered: false,
-  }
-  return state
-}
 
 class JsonVariable {
   name: any
@@ -56,71 +33,122 @@ class JsonVariable {
 }
 
 const JsonObject = defineComponent({
+  name: 'Object',
   props: {
     jsvRoot: Boolean,
-    vjvId: String,
-    src: Object,
-    theme: String,
-    iconStyle: String,
-    displayObjectSize: Boolean,
-    enableClipboard: Boolean,
-    name: String,
-    namespace: Array,
-    indentWidth: Number,
-    displayDataTypes: Boolean,
-    groupArraysAfterLength: Number,
-    quotesOnKeys: Boolean,
-    type: String,
-    depth: Number,
-    collapsed: [Boolean, Number],
+    vjvId: {
+      type: String,
+      required: true,
+    },
+    src: {
+      type: Object,
+      required: true,
+    },
+    name: {
+      type: [String, Boolean],
+      default: '',
+    },
+    namespace: {
+      type: Array,
+      required: true,
+    },
+    indexOffset: {
+      type: Number,
+      default: 0,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    depth: {
+      type: Number,
+      required: true,
+    },
+    parentType: {
+      type: String,
+      default: '',
+    },
   },
   setup(props: any) {
-    const state = reactive(getState(props))
+    const setting = store.get('setting')
+
+    const state = reactive<{
+      expanded: undefined | Boolean
+      hovered: Boolean
+    }>({
+      expanded: undefined,
+      hovered: false,
+    })
+    const size = computed(() => {
+      return Object.keys(props.src).length
+    })
+    const objectType = computed(() => {
+      return props.type === 'array' ? 'array' : 'object'
+    })
+    const expanded = computed({
+      get: () => {
+        if (state.expanded !== undefined) {
+          return state.expanded
+        }
+
+        return (
+          (setting.collapsed === false || (setting.collapsed !== true && setting.collapsed > props.depth)) &&
+          (!props.shouldCollapse ||
+            props.shouldCollapse({
+              name: props.name,
+              src: props.src,
+              type: toType(props.src),
+              namespace: props.namespace,
+            }) === false) &&
+          size.value !== 0 //initialize closed if object has no items
+        )
+      },
+      set: (val) => {
+        state.expanded = val
+      },
+    })
 
     function toggleCollapsed() {
-      state.expanded = !state.expanded
-      AttributeStore.set(props.vjvId, props.namespace, 'expanded', state.expanded)
+      expanded.value = !expanded.value
     }
     function getObjectContent(_: any, src: any, contentProps: any) {
       return (
         <div class="pushed-content object-container">
-          <div class="object-content" {...Theme(props.theme, 'pushed-content')}>
+          <div class="object-content" {...Theme(setting.theme, 'pushed-content')}>
             {renderObjectContents(src, contentProps)}
           </div>
         </div>
       )
     }
     function getEllipsis() {
-      const { size } = state
-
-      if (size === 0) {
+      if (size.value === 0) {
         //don't render an ellipsis when an object has no items
         return null
       } else {
         return (
-          <div {...Theme(props.theme, 'ellipsis')} class="node-ellipsis" onClick={toggleCollapsed}>
+          <div {...Theme(setting.theme, 'ellipsis')} class="node-ellipsis" onClick={toggleCollapsed}>
             ...
           </div>
         )
       }
     }
     function getObjectMetaData(_: any) {
-      const { size, hovered } = state
-      return <VariableMeta rowHovered={hovered} size={size} {...toRaw(props)} />
+      return <VariableMeta rowHovered={state.hovered} size={size.value} {...toRaw(props)} />
     }
-    function getBraceStart(object_type: any, expanded: boolean) {
-      const { src, theme, iconStyle, parent_type } = props
+    function getBraceStart() {
+      const { src, parentType } = props
+      const { theme, iconStyle } = setting
 
-      if (parent_type === 'array_group') {
+      if (parentType === 'array_group') {
         return (
           <span>
-            <span {...Theme(theme, 'brace')}>{object_type === 'array' ? '[' : '{'}</span>
-            {expanded ? getObjectMetaData(src) : null}
+            <span {...Theme(theme, 'brace')}>{objectType.value === 'array' ? '[' : '{'}</span>
+            {expanded.value ? getObjectMetaData(src) : null}
           </span>
         )
       }
 
-      const IconComponent = expanded ? ExpandedIcon : CollapsedIcon
+      const IconComponent = expanded.value ? ExpandedIcon : CollapsedIcon
 
       return (
         <span>
@@ -128,26 +156,26 @@ const JsonObject = defineComponent({
             <div class="icon-container" {...Theme(theme, 'icon-container')}>
               <IconComponent {...{ theme, iconStyle }} />
             </div>
-            <ObjectName {...props} />
-            <span {...Theme(theme, 'brace')}>{object_type === 'array' ? '[' : '{'}</span>
+            <ObjectName theme={theme} quotesOnKeys={setting.quotesOnKeys} {...props} />
+            <span {...Theme(theme, 'brace')}>{objectType.value === 'array' ? '[' : '{'}</span>
           </span>
-          {expanded ? getObjectMetaData(src) : null}
+          {expanded.value ? getObjectMetaData(src) : null}
         </span>
       )
     }
     function renderObjectContents(variables: any, contentProps: any) {
-      let elements: any[] = [],
-        variable
+      const elements: any[] = []
+      let variable
       let keys = Object.keys(variables || {})
-      if (props.sortKeys && state.object_type !== 'array') {
+      if (setting.sortKeys && objectType.value !== 'array') {
         keys = keys.sort()
       }
 
       keys.forEach((name) => {
         variable = new JsonVariable(name, variables[name])
 
-        if (props.parent_type === 'array_group' && props.index_offset) {
-          variable.name = parseInt(variable.name) + props.index_offset
+        if (props.parentType === 'array_group' && props.indexOffset) {
+          variable.name = parseInt(variable.name) + props.indexOffset
         }
         if (!variables.hasOwnProperty(name)) {
           return
@@ -160,14 +188,14 @@ const JsonObject = defineComponent({
               name={variable.name}
               src={variable.value}
               namespace={props.namespace.concat(variable.name)}
-              parent_type={state.object_type}
+              parentType={objectType.value}
               type="object"
             />,
           )
         } else if (variable.type === 'array') {
           let ObjectComponent = JsonObject
 
-          if (props.groupArraysAfterLength && variable.value.length > props.groupArraysAfterLength) {
+          if (setting.groupArraysAfterLength && variable.value.length > setting.groupArraysAfterLength) {
             ObjectComponent = ArrayGroup
           }
 
@@ -180,7 +208,7 @@ const JsonObject = defineComponent({
               src={variable.value}
               namespace={props.namespace.concat(variable.name)}
               type="array"
-              parent_type={state.object_type}
+              parentType={objectType.value}
             />,
           )
         } else {
@@ -190,7 +218,6 @@ const JsonObject = defineComponent({
               key={variable.name + '_' + props.namespace}
               variable={variable}
               singleIndent={SINGLE_INDENT}
-              namespace={props.namespace}
               type={props.type}
             />,
           )
@@ -201,35 +228,35 @@ const JsonObject = defineComponent({
     }
 
     return () => {
-      Object.assign(state, getState(props))
-
-      let styles: any = {}
-      if (!props.jsvRoot && props.parent_type !== 'array_group') {
-        styles.paddingLeft = props.indentWidth * SINGLE_INDENT
-      } else if (props.parent_type === 'array_group') {
+      const styles: any = {}
+      if (!props.jsvRoot && props.parentType !== 'array_group') {
+        styles.paddingLeft = setting.indentWidth * SINGLE_INDENT
+      } else if (props.parentType === 'array_group') {
         styles.borderLeft = 0
         styles.display = 'inline'
       }
+
+      const { depth, src, namespace, name, type, parentType, jsvRoot, ...rest } = props
 
       return (
         <div
           class="object-key-val"
           onMouseenter={() => (state.hovered = true)}
           onMouseleave={() => (state.hovered = false)}
-          {...Theme(props.theme, props.jsvRoot ? 'jsv-root' : 'objectKeyVal', styles)}
+          {...Theme(setting.theme, props.jsvRoot ? 'jsv-root' : 'objectKeyVal', styles)}
         >
-          {getBraceStart(state.object_type, state.expanded)}
-          {state.expanded ? getObjectContent(props.depth, props.src, props) : getEllipsis()}
+          {getBraceStart()}
+          {expanded.value ? getObjectContent(depth, src, rest) : getEllipsis()}
           <span class="brace-row">
             <span
               style={{
-                ...(Theme(props.theme, 'brace') as any).style,
-                paddingLeft: state.expanded ? '3px' : '0px',
+                ...(Theme(setting.theme, 'brace') as any).style,
+                paddingLeft: expanded.value ? '3px' : '0px',
               }}
             >
-              {state.object_type === 'array' ? ']' : '}'}
+              {objectType.value === 'array' ? ']' : '}'}
             </span>
-            {state.expanded ? null : getObjectMetaData(props.src)}
+            {expanded.value ? null : getObjectMetaData(src)}
           </span>
         </div>
       )

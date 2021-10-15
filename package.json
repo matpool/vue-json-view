@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "react-base16-styling": "^0.8.0",
+    "vore": "^1.0.1",
     "vue": "^3.2.16"
   },
   "devDependencies": {

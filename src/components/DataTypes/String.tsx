@@ -6,50 +6,47 @@ import { toType } from '../../helpers/util'
 import Theme from '../../themes/getStyle'
 
 //attribute store for storing collapsed state
-import AttributeStore from '../../stores/ObjectAttributes'
+import { store } from '../../stores'
 
 export default defineComponent({
   props: {
-    theme: String,
-    vjvId: String,
-    namespace: Array,
     value: {
       type: String,
       required: true,
     },
-    collapseStringsAfterLength: [Number, Boolean],
-    displayDataTypes: Boolean
   },
   setup(props) {
+    const setting = store.get('setting')
     const state = reactive({
-      collapsed: AttributeStore.get(props.vjvId, props.namespace, 'collapsed', true),
+      collapsed: true,
     })
 
     const toggleCollapsed = () => {
       state.collapsed = !state.collapsed
-      AttributeStore.set(props.vjvId, props.namespace, 'collapsed', state.collapsed)
     }
 
     return () => {
-      let value: any = props.value
-      let collapsible = toType(props.collapseStringsAfterLength) === 'integer'
-      let style = { style: { cursor: 'default' } }
+      const { collapseStringsAfterLength, displayDataTypes, theme } = setting
 
-      if (collapsible && value.length > (props.collapseStringsAfterLength as number)) {
+      let value: any = props.value
+      const collapsible = toType(collapseStringsAfterLength) === 'integer'
+      const style = { style: { cursor: 'default' } }
+
+      if (collapsible && value.length > (collapseStringsAfterLength as number)) {
         style.style.cursor = 'pointer'
         if (state.collapsed) {
           value = (
             <span>
-              {value.substring(0, props.collapseStringsAfterLength)}
-              <span {...Theme(props.theme, 'ellipsis')}> ...</span>
+              {value.substring(0, collapseStringsAfterLength)}
+              <span {...Theme(theme, 'ellipsis')}> ...</span>
             </span>
           )
         }
       }
 
       return (
-        <div {...Theme(props.theme, 'string')}>
-          <DataTypeLabel typeName="string" theme={props.theme} displayDataTypes={props.displayDataTypes} />
+        <div {...Theme(theme, 'string')}>
+          {displayDataTypes && <DataTypeLabel typeName="string" theme={theme} />}
           <span class="string-value" {...style} onClick={toggleCollapsed}>
             "{value}"
           </span>

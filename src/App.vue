@@ -17,7 +17,7 @@ const srcStr = {
     sibling1: true,
     sibling2: false,
     sibling3: null,
-    isString: function(value) {
+    isString: function (value) {
       if (typeof value === 'string') {
         return 'string'
       } else {
@@ -32,13 +32,31 @@ const srcStr = {
 }
 
 const collapsed = ref(1)
+const theme = ref('monokai')
+const sortKeys = ref(false)
+
+function handleChange(e) {
+  collapsed.value = +e.target.value
+}
+function handleSortKeysChange(e) {
+  sortKeys.value = Boolean(e.target.value)
+}
 </script>
 
 <template>
-<div>
-  <VueJsonView :src="srcStr" :collapsed="collapsed" theme="monokai" />
-  <button @click="collapsed = 2">change collapsed</button>
-</div>
+  <div>
+    <input @blur="handleChange" />
+    <select id="theme" v-model="theme" name="theme">
+      <option value="monokai">monokai</option>
+      <option value="apathy">apathy</option>
+    </select>
+    <select id="sortKeys" name="sortKeys" @change="handleSortKeysChange">
+      <option value="false">false</option>
+      <option value="true">true</option>
+    </select>
+
+    <VueJsonView :src="srcStr" :collapsed="collapsed" :theme="theme" :sort-keys="sortKeys" />
+  </div>
 </template>
 
 <style>

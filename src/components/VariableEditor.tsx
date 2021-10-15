@@ -3,7 +3,7 @@ import { defineComponent, reactive } from 'vue'
 import CopyToClipboard from './CopyToClipboard'
 
 //attribute store for storing collapsed state
-import AttributeStore from '../stores/ObjectAttributes'
+import { store } from '../stores'
 
 //data type components
 import {
@@ -28,20 +28,17 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    singleIndent: Number,
-    type: String,
-    theme: String,
-    namespace: {
-      type: Array,
+    singleIndent: {
+      type: Number,
       required: true,
     },
-    indentWidth: Number,
-    enableClipboard: [Function, Boolean],
-    displayArrayKey: Boolean,
-    quotesOnKeys: Boolean,
-    vjvId: String,
+    type: {
+      type: String,
+      required: true,
+    },
   },
   setup(props) {
+    const setting = store.get('setting')
     const state = reactive({
       editMode: false,
       editValue: '',
@@ -53,33 +50,37 @@ export default defineComponent({
       },
     })
 
-    const { displayArrayKey } = AttributeStore.get(props.vjvId, 'global', 'setting', {})
-
     const getValue = (variable: any, editMode: any) => {
       const type = editMode ? false : variable.type
+      const valueProps = {
+        value: variable.value,
+        theme: setting.theme,
+        displayDataTypes: setting.displayDataTypes,
+      }
+
       switch (type) {
         case false:
           return null
         case 'string':
-          return <JsonString value={variable.value} {...props} />
+          return <JsonString {...valueProps} />
         case 'integer':
-          return <JsonInteger value={variable.value} {...props} />
+          return <JsonInteger {...valueProps} />
         case 'float':
-          return <JsonFloat value={variable.value} {...props} />
+          return <JsonFloat {...valueProps} />
         case 'boolean':
-          return <JsonBoolean value={variable.value} {...props} />
+          return <JsonBoolean {...valueProps} />
         case 'function':
-          return <JsonFunction value={variable.value} {...props} />
+          return <JsonFunction {...valueProps} />
         case 'null':
-          return <JsonNull {...props} />
+          return <JsonNull {...valueProps} />
         case 'nan':
-          return <JsonNan {...props} />
+          return <JsonNan {...valueProps} />
         case 'undefined':
-          return <JsonUndefined {...props} />
+          return <JsonUndefined {...valueProps} />
         case 'date':
-          return <JsonDate value={variable.value} {...props} />
+          return <JsonDate {...valueProps} />
         case 'regexp':
-          return <JsonRegexp value={variable.value} {...props} />
+          return <JsonRegexp {...valueProps} />
         default:
           // catch-all for types that weren't anticipated
           return <div class="object-value">{JSON.stringify(variable.value)}</div>
@@ -89,8 +90,8 @@ export default defineComponent({
     return () => {
       return (
         <div
-          {...Theme(props.theme, 'objectKeyVal', {
-            paddingLeft: (props.indentWidth as number) * (props.singleIndent as number),
+          {...Theme(setting.theme, 'objectKeyVal', {
+            paddingLeft: (setting.indentWidth as number) * (props.singleIndent as number),
           })}
           onMouseenter={() => (state.hovered = true)}
           onMouseleave={() => (state.hovered = false)}
@@ -98,46 +99,32 @@ export default defineComponent({
           key={props.variable.name}
         >
           {props.type == 'array' ? (
-            displayArrayKey ? (
-              <span
-                {...Theme(props.theme, 'array-key')}
-                key={props.variable.name + '_' + props.namespace}
-              >
+            setting.displayArrayKey ? (
+              <span {...Theme(setting.theme, 'array-key')}>
                 {props.variable.name}
-                <div {...Theme(props.theme, 'colon')}>:</div>
+                <div {...Theme(setting.theme, 'colon')}>:</div>
               </span>
             ) : null
           ) : (
             <span>
-              <span
-                {...Theme(props.theme, 'object-name')}
-                class="object-key"
-                key={props.variable.name + '_' + props.namespace}
-              >
-                {!!props.quotesOnKeys && <span style={{ verticalAlign: 'top' }}>"</span>}
+              <span {...Theme(setting.theme, 'object-name')} class="object-key">
+                {!!setting.quotesOnKeys && <span style={{ verticalAlign: 'top' }}>"</span>}
                 <span style={{ display: 'inline-block' }}>{props.variable.name}</span>
-                {!!props.quotesOnKeys && <span style={{ verticalAlign: 'top' }}>"</span>}
+                {!!setting.quotesOnKeys && <span style={{ verticalAlign: 'top' }}>"</span>}
               </span>
-              <span {...Theme(props.theme, 'colon')}>:</span>
+              <span {...Theme(setting.theme, 'colon')}>:</span>
             </span>
           )}
           <div
             class="variable-value"
-            {...Theme(props.theme, 'variableValue', {
+            {...Theme(setting.theme, 'variableValue', {
               cursor: 'default',
             })}
           >
             {getValue(props.variable, state.editMode)}
           </div>
-          {props.enableClipboard ? (
-            <CopyToClipboard
-              rowHovered={state.hovered}
-              hidden={state.editMode}
-              src={props.variable.value}
-              clickCallback={props.enableClipboard}
-              theme={props.theme}
-              namespace={[...props.namespace, props.variable.name]}
-            />
+          {setting.enableClipboard ? (
+            <CopyToClipboard rowHovered={state.hovered} hidden={state.editMode} src={props.variable.value} />
           ) : null}
         </div>
       )

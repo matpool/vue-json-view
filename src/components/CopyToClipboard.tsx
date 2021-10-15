@@ -2,6 +2,8 @@ import { defineComponent, reactive, onBeforeUnmount } from 'vue'
 
 import { toType } from './../helpers/util'
 
+import { store } from '../stores'
+
 //clibboard icon
 import { Clippy } from './icons'
 
@@ -10,14 +12,15 @@ import Theme from './../themes/getStyle'
 
 export default defineComponent({
   props: {
-    theme: String,
-    src: [Object, String, Number, Boolean, Function],
+    src: {
+      type: [Object, String, Number, Boolean, Function],
+      default: '',
+    },
     rowHovered: Boolean,
     hidden: Boolean,
-    clickCallback: [Function, Boolean],
-    namespace: Array,
   },
   setup(props: any) {
+    const setting = store.get('setting')
     const state = reactive({ copied: false })
 
     let copiedTimer: any = null
@@ -46,28 +49,24 @@ export default defineComponent({
 
       state.copied = true
 
-      if (typeof props.clickCallback !== 'function') {
-        return
+      if (typeof setting.enableClipboard === 'function') {
+        setting.enableClipboard({
+          src: props.src,
+        })
       }
-
-      props.clickCallback({
-        src: props.src,
-        namespace: props.namespace,
-        name: props.namespace[props.namespace.length - 1],
-      })
     }
 
     function getClippyIcon() {
       if (state.copied) {
         return (
           <span>
-            <Clippy class="copy-icon" {...Theme(props.theme, 'copy-icon')} />
-            <span {...Theme(props.theme, 'copy-icon-copied')}>✔</span>
+            <Clippy class="copy-icon" {...Theme(setting.theme, 'copy-icon')} />
+            <span {...Theme(setting.theme, 'copy-icon-copied')}>✔</span>
           </span>
         )
       }
 
-      return <Clippy class="copy-icon" {...Theme(props.theme, 'copy-icon')} />
+      return <Clippy class="copy-icon" {...Theme(setting.theme, 'copy-icon')} />
     }
 
     function clipboardValue(value: any) {
@@ -82,7 +81,7 @@ export default defineComponent({
     }
 
     return () => {
-      let style = (Theme(props.theme, 'copy-to-clipboard') as any).style
+      const style = (Theme(setting.theme, 'copy-to-clipboard') as any).style
       let display = 'inline'
 
       if (props.hidden) {

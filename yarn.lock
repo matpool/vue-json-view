@@ -2164,6 +2164,11 @@ void-elements@^3.1.0:
   resolved "https://registry.npm.taobao.org/void-elements/download/void-elements-3.1.0.tgz#614f7fbf8d801f0bb5f0661f5b2f5785750e4f09"
   integrity sha1-YU9/v42AHwu18GYfWy9XhXUOTwk=
 
+vore@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmmirror.com/vore/download/vore-1.0.1.tgz#1ded4d16886d8314ef2bfba68ab03442a54e6619"
+  integrity sha1-He1NFohtgxTvK/umirA0QqVOZhk=
+
 vscode-css-languageservice@^5.1.4:
   version "5.1.7"
   resolved "https://registry.npmmirror.com/vscode-css-languageservice/download/vscode-css-languageservice-5.1.7.tgz?cache=0&sync_timestamp=1632844891919&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fvscode-css-languageservice%2Fdownload%2Fvscode-css-languageservice-5.1.7.tgz#ebbf803b03fde539bd683588cd2da6c4a61b90e2"

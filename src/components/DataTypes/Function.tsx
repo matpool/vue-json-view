@@ -5,36 +5,34 @@ import DataTypeLabel from './DataTypeLabel'
 import Theme from '../../themes/getStyle'
 
 //attribute store for storing collapsed state
-import AttributeStore from '../../stores/ObjectAttributes'
+import { store } from '../../stores'
 
 export default defineComponent({
   props: {
-    theme: String,
-    vjvId: String,
-    namespace: Array,
+    theme: {
+      type: String,
+      required: true,
+    },
     value: {
       type: Function,
-      required: true
+      required: true,
     },
-    displayDataTypes: Boolean
+    displayDataTypes: Boolean,
   },
   setup(props) {
+    const setting = store.get('setting')
     const state = reactive({
-      collapsed: AttributeStore.get(props.vjvId, props.namespace, 'collapsed', true),
+      collapsed: true,
     })
     const toggleCollapsed = () => {
       state.collapsed = !state.collapsed
-      // will be called after setState takes effect.
-      AttributeStore.set(props.vjvId, props.namespace, 'collapsed', state.collapsed)
     }
 
     const getFunctionDisplay = (collapsed: boolean) => {
       if (collapsed) {
         return (
           <span>
-            {props.value
-              .toString()
-              .replace(/\{[\s\S]+/, '')}
+            {props.value.toString().replace(/\{[\s\S]+/, '')}
             <span class="function-collapsed" style={{ fontWeight: 'bold' }}>
               <span>{'{'}</span>
               <span {...Theme(props.theme, 'ellipsis')}>...</span>
@@ -48,16 +46,12 @@ export default defineComponent({
     }
 
     return () => {
-      const type_name = 'function'
+      const { displayDataTypes, theme } = setting
 
       return (
-        <div {...Theme(props.theme, 'function')}>
-          <DataTypeLabel theme={props.theme} displayDataTypes={props.displayDataTypes} typeName={type_name} />
-          <span
-            {...Theme(props.theme, 'function-value')}
-            class="rjv-function-container"
-            onClick={toggleCollapsed}
-          >
+        <div {...Theme(theme, 'function')}>
+          {displayDataTypes && <DataTypeLabel theme={theme} typeName="function" />}
+          <span {...Theme(theme, 'function-value')} class="rjv-function-container" onClick={toggleCollapsed}>
             {getFunctionDisplay(state.collapsed)}
           </span>
         </div>

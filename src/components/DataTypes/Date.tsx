@@ -6,12 +6,15 @@ import Theme from '../../themes/getStyle'
 
 export default defineComponent({
   props: {
-    theme: String,
+    theme: {
+      type: String,
+      required: true,
+    },
     value: {
       type: Date,
-      required: true
+      required: true,
     },
-    displayDataTypes: Boolean
+    displayDataTypes: Boolean,
   },
   render() {
     const display_options = {
@@ -25,7 +28,7 @@ export default defineComponent({
 
     return (
       <div {...Theme(this.$props.theme, 'date')}>
-        <DataTypeLabel theme={this.$props.theme} displayDataTypes={this.$props.displayDataTypes} typeName="date"/>
+        {this.$props.displayDataTypes && <DataTypeLabel theme={this.$props.theme} typeName="date" />}
         <span class="date-value" {...Theme(this.$props.theme, 'date-value')}>
           {this.$props.value.toLocaleTimeString('en-us', display_options as Intl.DateTimeFormatOptions)}
         </span>

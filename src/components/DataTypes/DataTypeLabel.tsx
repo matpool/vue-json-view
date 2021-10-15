@@ -5,18 +5,20 @@ import Theme from './../../themes/getStyle'
 
 export default defineComponent({
   props: {
-    theme: String,
-    typeName: String,
-    displayDataTypes: Boolean,
+    theme: {
+      type: String,
+      required: true,
+    },
+    typeName: {
+      type: String,
+      required: true,
+    },
   },
   render() {
-    if (this.$props.displayDataTypes) {
-      return (
-        <span class="data-type-label" {...Theme(this.$props.theme, 'data-type-label')}>
-          {this.$props.typeName}
-        </span>
-      )
-    }
-    return null
+    return (
+      <span class="data-type-label" {...Theme(this.$props.theme, 'data-type-label')}>
+        {this.$props.typeName}
+      </span>
+    )
   },
 })
