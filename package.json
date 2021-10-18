@@ -18,7 +18,8 @@
     "dev": "vite serve example",
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
-    "lint": "vue-tsc --noEmit && eslint --fix"
+    "lint": "vue-tsc --noEmit && eslint --fix",
+    "release": "standard-version"
   },
   "keywords": [
     "array-viewer",
@@ -55,6 +56,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-vue": "^7.10.0",
     "prettier": "^2.4.1",
+    "standard-version": "^9.3.2",
     "typescript": "^4.4.3",
     "vite": "^2.6.4",
     "vue": "^3.2.0",
