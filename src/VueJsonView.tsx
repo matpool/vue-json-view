@@ -2,6 +2,7 @@ import { defineComponent, provide, reactive, ref, toRaw } from 'vue'
 
 import JsonObject from './components/DataTypes/Object'
 import ArrayGroup from './components/ArrayGroup'
+import { JsonNull, JsonUndefined } from './components/DataTypes/DataTypes'
 import { toType } from './helpers/util'
 
 //global theme
@@ -24,6 +25,10 @@ export default defineComponent({
     },
     sortKeys: {
       type: Boolean,
+      default: false,
+    },
+    name: {
+      type: [Boolean, String],
       default: false,
     },
   },
@@ -49,7 +54,7 @@ export default defineComponent({
     provide('setting', setting)
 
     const srcRef = ref({})
-    const name = ref('root')
+    const name = ref<Boolean | String>(props.name)
 
     return () => {
       try {
@@ -82,21 +87,29 @@ export default defineComponent({
 
       Object.assign(setting, propsRaw)
 
-      let ObjectComponent = JsonObject
-      if (
-        Array.isArray(srcRef.value) &&
-        setting.groupArraysAfterLength &&
-        srcRef.value.length > setting.groupArraysAfterLength
-      ) {
-        ObjectComponent = ArrayGroup
+      function getObjectComponent() {
+        if (props.src === null) {
+          return <JsonNull />
+        }
+        if (props.src === undefined) {
+          return <JsonUndefined />
+        }
+
+        let ObjectComponent = JsonObject
+        if (
+          Array.isArray(srcRef.value) &&
+          setting.groupArraysAfterLength &&
+          srcRef.value.length > setting.groupArraysAfterLength
+        ) {
+          ObjectComponent = ArrayGroup
+        }
+        return <ObjectComponent {...objectProps} />
       }
 
       return (
         <div class="vue-json-view" {...Theme(setting.theme, 'app-container')}>
           <div class="pretty-json-container object-container">
-            <div class="object-content">
-              <ObjectComponent {...objectProps} />
-            </div>
+            <div class="object-content">{getObjectComponent()}</div>
           </div>
         </div>
       )

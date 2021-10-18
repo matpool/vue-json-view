@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import dayjs from 'dayjs'
 import VueJsonView from '../src/VueJsonView'
 
-const srcStr = {
+const srcStr = JSON.stringify({
   string: 'this is a test string',
   integer: 42,
   empty_array: [],
@@ -29,7 +29,7 @@ const srcStr = {
   date: new Date(),
   moment: dayjs(),
   regexp: /[0-9]/gi,
-}
+})
 
 const collapsed = ref(1)
 const theme = ref('monokai')
@@ -55,7 +55,7 @@ function handleSortKeysChange(e) {
       <option value="true">true</option>
     </select>
 
-    <VueJsonView :src="srcStr" :collapsed="collapsed" :theme="theme" :sort-keys="sortKeys" />
+    <VueJsonView :src="'asd'" :collapsed="collapsed" :theme="theme" :sort-keys="sortKeys" name="src" />
   </div>
 </template>
 
