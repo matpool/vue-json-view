@@ -14,7 +14,7 @@ export default defineComponent({
   setup(props) {
     const setting: any = inject('setting')
 
-    return (
+    return () => (
       <div {...Theme(setting.theme, 'integer')}>
         {setting.displayDataTypes && <DataTypeLabel typeName="int" />}
         {props.value}

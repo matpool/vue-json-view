@@ -14,7 +14,7 @@ export default defineComponent({
   setup(props) {
     const setting: any = inject('setting')
 
-    return (
+    return () => (
       <div {...Theme(setting.theme, 'regexp')}>
         {setting.displayDataTypes && <DataTypeLabel typeName="regexp" />}
         {props.value.toString()}

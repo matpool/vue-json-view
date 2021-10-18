@@ -31,7 +31,7 @@ export default defineComponent({
     // initialize
     const setting = reactive({
       theme: 'monokai',
-      collapseStringsAfterLength: 5,
+      collapseStringsAfterLength: false,
       shouldCollapse: false,
       quotesOnKeys: true,
       groupArraysAfterLength: 100,
@@ -85,14 +85,14 @@ export default defineComponent({
       let ObjectComponent = JsonObject
       if (
         Array.isArray(srcRef.value) &&
-        objectProps.groupArraysAfterLength &&
-        srcRef.value.length > objectProps.groupArraysAfterLength
+        setting.groupArraysAfterLength &&
+        srcRef.value.length > setting.groupArraysAfterLength
       ) {
         ObjectComponent = ArrayGroup
       }
 
       return (
-        <div class="vue-json-view" {...Theme(objectProps.theme, 'app-container')}>
+        <div class="vue-json-view" {...Theme(setting.theme, 'app-container')}>
           <div class="pretty-json-container object-container">
             <div class="object-content">
               <ObjectComponent {...objectProps} />
