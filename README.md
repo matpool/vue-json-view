@@ -13,7 +13,7 @@ This project is forked from [react-json-view](https://github.com/mac-s-g/react-j
 
 ### Usage
 ```js
-// import the react-json-view component
+// import the vue-json-view component
 import VueJsonView from '@matpool/vue-json-view'
 
 // use the component in your app!

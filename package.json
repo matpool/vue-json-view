@@ -36,7 +36,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vueComponent/ant-design-vue.git"
+    "url": "git+https://github.com/matpool/vue-json-view.git"
   },
   "license": "MIT",
   "author": "Sam Chai",
