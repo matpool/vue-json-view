@@ -1,6 +1,6 @@
 {
   "name": "@matpool/vue-json-view",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "vue3 component for displaying javascript arrays and JSON objects.",
   "main": "./dist/vue-json-view.umd.js",
   "module": "./dist/vue-json-view.es.js",
