@@ -95,10 +95,10 @@ export default defineComponent({
       Object.assign(setting, propsRaw)
 
       function getObjectComponent() {
-        if (props.src === null) {
+        if (srcRef.value === null) {
           return <JsonNull />
         }
-        if (props.src === undefined) {
+        if (srcRef.value === undefined) {
           return <JsonUndefined />
         }
 
