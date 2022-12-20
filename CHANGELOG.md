@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.7](https://github.com/matpool/vue-json-view/compare/v0.1.6...v0.1.7) (2022-12-20)
+
+
+### Bug Fixes
+
+* 修复null/undefined的判断 ([23b1e99](https://github.com/matpool/vue-json-view/commit/23b1e99aaade37b346161f59537edd0e1f058b5a))
+
 ### 0.1.6 (2022-12-20)
 
 
