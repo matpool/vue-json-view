@@ -1,4 +1,4 @@
-import { defineComponent, provide, reactive, ref, toRaw } from 'vue'
+import { computed, defineComponent, provide, reactive, toRaw } from 'vue'
 
 import JsonObject from './components/DataTypes/Object'
 import ArrayGroup from './components/ArrayGroup'
@@ -7,6 +7,10 @@ import { toType } from './helpers/util'
 
 //global theme
 import Theme from './themes/getStyle'
+
+class ParseJSONError {
+  constructor(public message: string) {}
+}
 
 export default defineComponent({
   name: 'VueJsonView',
@@ -53,23 +57,26 @@ export default defineComponent({
 
     provide('setting', setting)
 
-    const srcRef = ref({})
-    const name = ref<Boolean | String>(props.name)
-
-    return () => {
+    const srcRef = computed(() => {
       try {
         if (typeof props.src === 'object') {
-          srcRef.value = props.src
+          return props.src
         } else {
-          srcRef.value = JSON.parse(props.src)
+          return JSON.parse(props.src)
         }
       } catch (error: any) {
-        name.value = 'ERROR'
-        srcRef.value = {
-          message: error.message || 'src必须是一个JSON数据',
-        }
+        return new ParseJSONError(error.message || 'src必须是一个JSON数据')
       }
+    })
 
+    const name = computed(() => {
+      if (srcRef.value instanceof ParseJSONError) {
+        return 'ERROR'
+      }
+      return props.name
+    })
+
+    return () => {
       const propsRaw: any = { ...toRaw(props) }
       delete propsRaw.src
       if (!propsRaw.theme) {

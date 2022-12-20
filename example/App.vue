@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import dayjs from 'dayjs'
 import VueJsonView from '../src/VueJsonView'
 
-const srcStr = JSON.stringify({
+const srcStr = ref<any>({
   string: 'this is a test string',
   integer: 42,
   empty_array: [],
@@ -41,10 +41,16 @@ function handleChange(e) {
 function handleSortKeysChange(e) {
   sortKeys.value = Boolean(e.target.value)
 }
+
+function onChange() {
+  srcStr.value = JSON.stringify({ id: Math.random() })
+}
 </script>
 
 <template>
   <div>
+    <button @click="onChange">change</button>
+
     <input @blur="handleChange" />
     <select id="theme" v-model="theme" name="theme">
       <option value="monokai">monokai</option>
@@ -55,7 +61,7 @@ function handleSortKeysChange(e) {
       <option value="true">true</option>
     </select>
 
-    <VueJsonView :src="'asd'" :collapsed="collapsed" :theme="theme" :sort-keys="sortKeys" name="src" />
+    <VueJsonView :src="srcStr" :collapsed="collapsed" :theme="theme" :sort-keys="sortKeys" name="src" />
   </div>
 </template>
 
