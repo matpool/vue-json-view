@@ -35,6 +35,10 @@ export default defineComponent({
       type: [Boolean, String],
       default: false,
     },
+    enableClipboard: {
+      type: [Boolean, Function],
+      default: true,
+    },
   },
   setup(props) {
     // initialize
@@ -45,7 +49,7 @@ export default defineComponent({
       quotesOnKeys: true,
       groupArraysAfterLength: 100,
       indentWidth: 2,
-      enableClipboard: true,
+      enableClipboard: props.enableClipboard,
       displayObjectSize: true,
       displayDataTypes: false,
       iconStyle: 'triangle',

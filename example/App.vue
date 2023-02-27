@@ -45,6 +45,10 @@ function handleSortKeysChange(e) {
 function onChange() {
   srcStr.value = JSON.stringify({ id: Math.random() })
 }
+
+function enableClipboard(data) {
+  console.log(data)
+}
 </script>
 
 <template>
@@ -61,7 +65,14 @@ function onChange() {
       <option value="true">true</option>
     </select>
 
-    <VueJsonView :src="srcStr" :collapsed="collapsed" :theme="theme" :sort-keys="sortKeys" name="src" />
+    <VueJsonView
+      :src="srcStr"
+      :collapsed="collapsed"
+      :theme="theme"
+      :sort-keys="sortKeys"
+      :enable-clipboard="enableClipboard"
+      name="src"
+    />
   </div>
 </template>
 
