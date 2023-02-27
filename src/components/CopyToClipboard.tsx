@@ -1,4 +1,4 @@
-import { defineComponent, inject, reactive, onBeforeUnmount } from 'vue'
+import { defineComponent, inject, reactive, onBeforeUnmount, toRaw } from 'vue'
 
 import { toType } from './../helpers/util'
 
@@ -19,6 +19,7 @@ export default defineComponent({
   },
   setup(props: any) {
     const setting: any = inject('setting')
+    const copyConfig: any = toRaw(inject('copyConfig'))
 
     const state = reactive({ copied: false })
 
@@ -51,6 +52,8 @@ export default defineComponent({
       if (typeof setting.enableClipboard === 'function') {
         setting.enableClipboard({
           src: props.src,
+          name: copyConfig.name,
+          namespace: copyConfig.namespace,
         })
       }
     }

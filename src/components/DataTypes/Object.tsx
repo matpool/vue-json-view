@@ -1,4 +1,4 @@
-import { defineComponent, inject, reactive, computed, toRaw } from 'vue'
+import { defineComponent, inject, reactive, computed, toRaw, provide } from 'vue'
 import { toType } from '../../helpers/util'
 
 import VariableEditor from './../VariableEditor'
@@ -65,6 +65,12 @@ const JsonObject = defineComponent({
   },
   setup(props: any) {
     const setting: any = inject('setting')
+
+    const copyConfig = reactive({
+      name: props.name,
+      namespace: props.namespace,
+    })
+    provide('copyConfig', copyConfig)
 
     const state = reactive<{
       expanded: undefined | Boolean

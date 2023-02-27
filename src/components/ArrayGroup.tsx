@@ -1,4 +1,4 @@
-import { defineComponent, inject, reactive, toRaw } from 'vue'
+import { defineComponent, inject, provide, reactive, toRaw } from 'vue'
 import Theme from './../themes/getStyle'
 
 import VariableMeta from './VariableMeta'
@@ -46,6 +46,12 @@ export default defineComponent({
   },
   setup(props: any) {
     const setting: any = inject('setting')
+
+    const copyConfig = reactive({
+      name: props.name,
+      namespace: toRaw(props.namespace),
+    })
+    provide('copyConfig', copyConfig)
 
     const state = reactive<{ [key: string]: any[] }>({
       expanded: [],
